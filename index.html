@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Telepathic</title>
+<meta name="description" content="Telepathic is a teleprompter for iPhone, iPad and any browser: mirroring, voice follow, recording, live remote and cloud sync.">
+<meta name="theme-color" content="#0b0c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Telepathic">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<main id="app">
+  <!-- Library -->
+  <section id="view-library" class="view">
+    <header class="top">
+      <h1>Telepathic</h1>
+      <button type="button" id="sync-chip" class="chip" aria-label="Cloud sync status"></button>
+    </header>
+    <div class="searchbar">
+      <span class="search-ico" id="search-ico"></span>
+      <input id="search" type="search" placeholder="Search scripts" autocomplete="off" aria-label="Search scripts">
+    </div>
+    <div id="folders" class="chips" role="tablist" aria-label="Folders"></div>
+    <div id="script-list" class="list"></div>
+    <button type="button" id="new-btn" class="fab"><span id="new-ico"></span><span>New script</span></button>
+  </section>
+
+  <!-- Editor -->
+  <section id="view-editor" class="view" hidden>
+    <header class="top tight">
+      <button type="button" id="ed-back" class="icon-btn" aria-label="Back to scripts"></button>
+      <span id="ed-saved" class="muted small grow">Saved</span>
+      <button type="button" id="ed-more" class="icon-btn" aria-label="More actions"></button>
+      <button type="button" id="ed-prompt" class="btn primary"><span id="ed-prompt-ico"></span><span>Prompt</span></button>
+    </header>
+    <input id="ed-title" class="title-field" type="text" placeholder="Title" autocomplete="off" aria-label="Script title">
+    <div id="ed-tools" class="toolbar" role="toolbar" aria-label="Formatting">
+      <button type="button" data-t="bold" aria-label="Bold"><b>B</b></button>
+      <button type="button" data-t="italic" aria-label="Italic"><i>I</i></button>
+      <button type="button" data-t="underline" aria-label="Underline"><u>U</u></button>
+      <span class="tool-sep"></span>
+      <button type="button" data-t="hl" id="ed-hl" aria-label="Highlighter" aria-pressed="false"></button>
+      <span id="ed-hl-colors" class="hl-colors" hidden></span>
+      <span class="tool-sep"></span>
+      <button type="button" data-t="pause">Pause</button>
+      <button type="button" data-t="speed">Speed</button>
+      <button type="button" data-t="section">Section</button>
+      <button type="button" data-t="note">Note</button>
+      <button type="button" data-t="clear">Clear</button>
+      <span class="tool-sep"></span>
+      <button type="button" data-t="preview" id="ed-preview-btn" aria-pressed="false">Preview</button>
+    </div>
+    <textarea id="ed-body" placeholder="Type or paste your script here. It saves as you type." spellcheck="true" aria-label="Script text"></textarea>
+    <div id="ed-preview" class="preview script" hidden></div>
+    <footer id="ed-stats" class="stats"></footer>
+  </section>
+
+  <!-- Remote -->
+  <section id="view-remote" class="view" hidden>
+    <header class="top"><h1>Remote</h1><span id="rm-conn" class="chip static"></span></header>
+    <div id="rm-body" class="pad"></div>
+  </section>
+
+  <!-- Settings -->
+  <section id="view-settings" class="view" hidden>
+    <header class="top"><h1>Settings</h1></header>
+    <div id="st-body" class="pad"></div>
+  </section>
+
+  <nav id="tabs" aria-label="Main">
+    <button type="button" data-view="library" class="on"><span data-ico="doc"></span><span>Scripts</span></button>
+    <button type="button" data-view="remote"><span data-ico="remote"></span><span>Remote</span></button>
+    <button type="button" data-view="settings"><span data-ico="gear"></span><span>Settings</span></button>
+  </nav>
+</main>
+
+<!-- Prompter -->
+<section id="view-prompter" hidden>
+  <div id="stage">
+    <video id="cam" playsinline muted autoplay></video>
+    <div id="shade"></div>
+    <div id="flip">
+      <div id="viewport"><div id="track" class="script"></div><div id="guide"></div></div>
+      <div id="dim-top"></div>
+      <div id="dim-bot"></div>
+      <div id="countdown" hidden></div>
+    </div>
+    <div id="hud">
+      <div class="hud-bar hud-top">
+        <button type="button" id="p-close" class="icon-btn" aria-label="Close prompter"></button>
+        <div class="hud-title"><span id="p-title"></span><span id="p-rec-time" class="rec-time"></span></div>
+        <div class="hud-time"><span id="p-elapsed">0:00</span><span id="p-remaining" class="muted"></span></div>
+        <div class="progress"><i id="p-progress"></i></div>
+      </div>
+      <div id="p-status" class="status-chip" hidden></div>
+      <div class="hud-bar hud-bottom">
+        <div class="hud-tools">
+          <button type="button" id="p-voice" class="tool"><i data-ico="mic"></i><span>Voice</span></button>
+          <button type="button" id="p-mirror" class="tool" aria-label="Mirror left to right"><i data-ico="mirror"></i><span>Mirror</span></button>
+          <button type="button" id="p-flipv" class="tool" aria-label="Flip top to bottom"><i data-ico="flipV"></i><span>Flip</span></button>
+          <button type="button" id="p-rot" class="tool" aria-label="Rotate the text"><i data-ico="rotate"></i><span>Rotate</span></button>
+          <button type="button" id="p-mode" class="tool"><i data-ico="sliders"></i><span>Speed</span></button>
+          <button type="button" id="p-sections" class="tool"><i data-ico="list"></i><span>Sections</span></button>
+          <button type="button" id="p-camera" class="tool"><i data-ico="camera"></i><span>Camera</span></button>
+          <button type="button" id="p-settings" class="tool"><i data-ico="eye"></i><span>Display</span></button>
+        </div>
+        <div class="hud-main">
+          <button type="button" id="p-restart" class="icon-btn" aria-label="Back to the start"></button>
+          <button type="button" id="p-back" class="icon-btn" aria-label="Back a few lines"></button>
+          <button type="button" id="p-minus" class="icon-btn" aria-label="Slower"></button>
+          <div class="play-wrap">
+            <button type="button" id="p-play" class="play" aria-label="Play"></button>
+            <div id="p-speed" class="speed"></div>
+          </div>
+          <button type="button" id="p-plus" class="icon-btn" aria-label="Faster"></button>
+          <button type="button" id="p-fwd" class="icon-btn" aria-label="Forward a few lines"></button>
+          <button type="button" id="p-rec" class="icon-btn rec" aria-label="Record"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<input type="file" id="file-input" hidden multiple accept=".txt,.md,.markdown,.rtf,.docx,.pptx,.pdf,.html,.htm,.json,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain,application/pdf,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/json">
+
+<script src="vendor/supabase.js" defer></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

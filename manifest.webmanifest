@@ -1,0 +1,17 @@
+{
+  "name": "Telepathic Teleprompter",
+  "short_name": "Telepathic",
+  "description": "A teleprompter with mirroring, voice follow, recording, live remote and cloud sync.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0c0f",
+  "theme_color": "#0b0c0f",
+  "categories": ["productivity", "utilities", "photo"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
